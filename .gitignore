@@ -1,0 +1,8 @@
+.DS_Store
+__pycache__
+__init__.pyc
+.env
+test.db
+ven
+flask_session
+.vscode
