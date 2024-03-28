@@ -11,7 +11,7 @@ class App_Config:
 
     SECRET_KEY = os.getenv("SECRET_KEY", "test")
 
-    # SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
 

@@ -47,11 +47,11 @@ def create_app():
     # Importing the models here so it can create the empty tables.
     # the routes
 
-    # from todo_app.users.views import users
-    # from todo_app.todo.views import todos
+    from todo_api.users.views import users
+    from todo_api.todo.views import todos
 
-    # app.register_blueprint(users)
-    # app.register_blueprint(todos)
+    app.register_blueprint(users)
+    app.register_blueprint(todos)
 
     # create db tables from models if not exists
     with app.app_context():
