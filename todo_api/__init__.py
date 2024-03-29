@@ -4,6 +4,7 @@ from flask_session import Session  # type: ignore
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_mail import Mail
+from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from todo_api.config import App_Config
 
@@ -12,10 +13,11 @@ db = SQLAlchemy()
 
 bcrypt = Bcrypt()
 
-
 sess = Session()
 
 mail = Mail()
+
+ma = Marshmallow()
 
 
 def create_app():
@@ -43,6 +45,9 @@ def create_app():
 
     # Initialize Bcrypt
     mail.init_app(app)
+
+    # Initialize Marshmallow
+    ma.init_app(app)
 
     # Importing the models here so it can create the empty tables.
     # the routes

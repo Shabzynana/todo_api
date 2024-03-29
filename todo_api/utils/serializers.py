@@ -1,4 +1,11 @@
 from todo_api import ma
+from todo_api.models import User
+
+
+class UserSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = User
+        include_fk = False
 
 class UserSchema(ma.Schema):
     class Meta:
