@@ -29,6 +29,7 @@ def all_users():
     except:
         pass  
 
+
 @users.route("/user/<username>", methods=['GET'])  
 def username(username):  
 
@@ -36,9 +37,28 @@ def username(username):
         user = User.query.filter_by(username=username).first()   
         if user:
             result = user_schema.dump(user)
-            retuen
-    except:
-        pass        
+            return jsonify(
+                {"msg": result}),200
+        
+        return jsonify(
+                {
+                    "error": "failed",
+                    "msg": f"No user with username {username}"
+                    })        
+
+    except Exception as error:
+        error_message = str(error)  # Convert the error to a string
+        print(f"{type(error).__name__}: {error}")
+        return (
+            jsonify(
+                {
+                    "error": "failed",
+                    "message": error_message,
+                }
+            ),
+            500,
+    )                      
+    
 
 
          
