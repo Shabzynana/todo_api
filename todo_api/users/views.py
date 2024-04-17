@@ -115,7 +115,7 @@ def register():
             jsonify(
                 {
                     "error": "failed",
-                    "message": error_message
+                    "message": error_message,
                     "message": "Internal Error: User not created",
                 }
             ),
@@ -130,7 +130,7 @@ def register():
 #     return {"msg": "User logout, Successful"}
 
 
-@users.route('/api/login', methods=['GET','POST'])
+@users.route('/login', methods=['POST'])
 def login():
 
     email = request.json['email']
@@ -138,12 +138,17 @@ def login():
 
     user = User.query.filter_by(email=email).first()
     if user is None:
-        return {"msg": "User with email not found"}, 404
+        return jsonify(
+            {"msg": "User with email not found"}), 404
 
     elif bcrypt.check_password_hash(user.password, password) and user is not None:
         session['logged_in'] = True
         session["user_id"] = {"id": user.id}
-        return {"msg": "login Successful"}, 200
+        
+        print(f'login in gee {user.id}')
+        return jsonify(
+            {"msg": "login Successful"}), 200
 
     elif bcrypt.check_password_hash(user.password, password) is None or user is not None:
-        return {"msg": "Incorrect password"}, 400
+        return jsonify(
+            {"msg": "Incorrect password"}), 400
