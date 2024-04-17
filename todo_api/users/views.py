@@ -22,10 +22,23 @@ def all_users():
         users = User.query.all()
         if users:
             result = users_schema.dump(users)
-            return {"msg": result}
+            return jsonify(
+                {"msg": result}),200
+
         return {"msg": "No user yet"} 
     except:
-        pass     
+        pass  
+
+@users.route("/user/<username>", methods=['GET'])  
+def username(username):  
+
+    try:
+        user = User.query.filter_by(username=username).first()   
+        if user:
+            result = user_schema.dump(user)
+            retuen
+    except:
+        pass        
 
 
          
@@ -124,12 +137,6 @@ def register():
 
 
 
-# @users.route("/api/logout", methods=['POST'])
-# def logout():
-#     logout_user()
-#     return {"msg": "User logout, Successful"}
-
-
 @users.route('/login', methods=['POST'])
 def login():
 
@@ -152,3 +159,15 @@ def login():
     elif bcrypt.check_password_hash(user.password, password) is None or user is not None:
         return jsonify(
             {"msg": "Incorrect password"}), 400
+
+
+@users.route("/logout", methods=['POST'])
+def logout():
+    
+    session.clear()
+    return jsonify(
+        {
+            "msg": "User logout, Successful"
+        }
+    ),200  
+
