@@ -1,6 +1,7 @@
 from flask import url_for, render_template
 from flask_mail import Message
-from flask_login import current_user
+# from flask_login import current_user
+from todo_api.utils.function import current_user_id
 
 
 from todo_api import mail
@@ -16,12 +17,12 @@ def send_email(user):
 
 
 
-def resend_email(current_user):
-    token = get_token(current_user)
+def resend_email(current_user_id):
+    token = get_token(current_user_id)
     msg = Message('Email',
                   sender='noreply@demo.com',
-                  recipients=[current_user.email])
-    msg.html = render_template('activate_email.html', token=token, _external=True)
+                  recipients=[current_user_id.email])
+    msg.html = render_template('users/activate_email.html', token=token, _external=True)
     mail.send(msg)
 
 

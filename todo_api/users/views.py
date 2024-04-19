@@ -1,10 +1,11 @@
-# import datetime
+import datetime
 from flask import url_for,flash,request,redirect,Blueprint,abort,jsonify,session  #type : ignore
 from todo_api.utils.serializers import user_schema, users_schema,User_Schema
 from todo_api import db,bcrypt
 from todo_api.models import User, Todo
-from todo_api.utils.email import send_reset_password
+from todo_api.utils.email import send_reset_password, resend_email, send_email
 from todo_api.utils.token import verify_token
+from todo_api.utils.function import current_user_id
 
 
 
@@ -168,6 +169,9 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        user = User.query.filter_by(email=email).first()
+        send_email(user)
+
         print(new_user)
         result = user_schema.dump(new_user)
         return jsonify({
@@ -229,7 +233,7 @@ def logout():
 def reset_token():
 
     email = request.json['email']
-    
+
     try:
 
         email_exists = User.query.filter_by(email=email).first()
@@ -288,3 +292,46 @@ def reset_password(token):
             500,
     )              
        
+@users.route('/email/resend', methods=['POST'])
+def resend():
+
+    try:
+
+        resend_email(current_user_id())
+        return jsonify(
+            {"msg": "A new confirmation mail has been sent with instructions to verify your account."}), 200
+    
+    except Exception as error:
+        error_message = str(error)  # Convert the error to a string
+        print(f"{type(error).__name__}: {error}")
+        return (
+            jsonify(
+                {
+                    "error": "failed",
+                    "message": error_message,
+                }
+            ),
+            500,
+    )             
+
+
+
+@users.route('/confirm/<token>', methods=['POST'])
+def confirm_email(token):
+
+    tok = verify_token(token)
+    if tok is None:
+        return jsonify(
+            {"msg": "That is an invalid or expired link"})
+
+    user = User.query.filter_by(id=tok.id).first_or_404()
+    if user.confirmed:
+        return jsonify(
+            {"msg": f"Account already confirmed : {user.username}"}), 200
+    else:
+        user.confirmed = True
+        user.confirmed_on = datetime.datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        return jsonify (
+            {"msg": f"You have confirmed your account. Thanks {user.username}"}), 200
