@@ -15,6 +15,8 @@ def home():
 
     return jsonify({"message": "i love jesus"})
 
+
+
 @users.route("/users", methods=['GET'])    
 def all_users():
 
@@ -28,6 +30,37 @@ def all_users():
         return {"msg": "No user yet"} 
     except:
         pass  
+
+@users.route("/users/<int:id>", methods=['GET'])
+def user_id(id):
+
+    try:
+
+        user = User.query.get(id)
+        if user:
+            result = user_schema.dump(user)
+            return jsonify(
+                {"msg": result}),200
+
+        return jsonify(
+                {
+                    "error": "failed",
+                    "msg": f"No user with such id {id}",
+                    })  
+
+    except Exception as error:
+        error_message = str(error)  # Convert the error to a string
+        print(f"{type(error).__name__}: {error}")
+        return (
+            jsonify(
+                {
+                    "error": "failed",
+                    "message": error_message,
+                }
+            ),
+            500,
+    )            
+
 
 
 @users.route("/user/<username>", methods=['GET'])  
@@ -43,7 +76,7 @@ def username(username):
         return jsonify(
                 {
                     "error": "failed",
-                    "msg": f"No user with username {username}"
+                    "msg": f"No user with username {username}",
                     })        
 
     except Exception as error:
@@ -58,11 +91,8 @@ def username(username):
             ),
             500,
     )                      
-    
-
 
          
-
 
 @users.route('/register', methods=['POST'])
 def register():
@@ -149,7 +179,6 @@ def register():
                 {
                     "error": "failed",
                     "message": error_message,
-                    "message": "Internal Error: User not created",
                 }
             ),
             500,
@@ -166,7 +195,7 @@ def login():
     user = User.query.filter_by(email=email).first()
     if user is None:
         return jsonify(
-            {"msg": "User with email not found"}), 404
+            {"msg": "User with email does not exist"}), 404
 
     elif bcrypt.check_password_hash(user.password, password) and user is not None:
         session['logged_in'] = True
