@@ -25,12 +25,12 @@ class App_Config:
     # PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=30)
 
     ## MAIL CONFIG
-    # MAIL_SERVER = 'sandbox.smtp.mailtrap.io'
-    # MAIL_PORT = 2525
-    # MAIL_USE_TLS = True
-    # MAIL_USE_SSL = False
-    # MAIL_USERNAME = os.getenv("USER_MAIL")
-    # MAIL_PASSWORD = os.getenv("PASSWORD_MAIL")
+    MAIL_SERVER = 'sandbox.smtp.mailtrap.io'
+    MAIL_PORT = 2525
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = os.getenv("USER_MAIL")
+    MAIL_PASSWORD = os.getenv("PASSWORD_MAIL")
 
 
 

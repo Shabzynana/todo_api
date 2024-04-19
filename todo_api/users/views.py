@@ -3,10 +3,10 @@ from flask import url_for,flash,request,redirect,Blueprint,abort,jsonify,session
 from todo_api.utils.serializers import user_schema, users_schema,User_Schema
 from todo_api import db,bcrypt
 from todo_api.models import User, Todo
-# from todo_app.users.picture import current_user_id, login_required, check_confirmed
+from todo_api.utils.email import send_reset_password
 
 
-users = Blueprint('users',__name__,url_prefix="/api")
+users = Blueprint('users',__name__, url_prefix="/api", template_folder ="templates/user")
 
 
 
@@ -222,17 +222,40 @@ def logout():
         }
     ),200  
 
+
 @users.route("/reset_password", methods=['POST'])   
-def get_reset():
+def reset_token():
 
     email = request.json['email']
 
     try:
 
+        email_exists = User.query.filter_by(email=email).first()
+        if not email_exists:
+            return (
+                jsonify({"error": "Forbbiden", "message": "Email not found, Please recheck the email!"}),
+                403,
+            )
+
         user = User.query.filter_by(email=email).first()
         send_reset_password(user)
-        flash('An email has been sent with instructions to reset your password.', 'info')
-        return redirect(url_for('users.login'))
+        return jsonify (
+            {"msg": "An email has been sent with instructions to reset your password"}),200
 
-        
+          
+    except Exception as error:
+        error_message = str(error)  # Convert the error to a string
+        print(f"{type(error).__name__}: {error}")
+        return (
+            jsonify(
+                {
+                    "error": "failed",
+                    "message": error_message,
+                }
+            ),
+            500,
+    )          
+
+
+
 

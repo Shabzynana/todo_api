@@ -31,5 +31,5 @@ def send_reset_password(user):
     msg = Message('Password Reset Request',
                   sender='noreply@demo.com',
                   recipients=[user.email])
-    msg.html = render_template('password_reset.html', token=token, _external=True)
+    msg.html = render_template('users/password_reset.html', token=token, _external=True)
     mail.send(msg)
