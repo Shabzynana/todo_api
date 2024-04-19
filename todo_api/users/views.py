@@ -31,6 +31,8 @@ def all_users():
     except:
         pass  
 
+
+
 @users.route("/users/<int:id>", methods=['GET'])
 def user_id(id):
 
@@ -219,4 +221,18 @@ def logout():
             "msg": "User logout, Successful"
         }
     ),200  
+
+@users.route("/reset_password", methods=['POST'])   
+def get_reset():
+
+    email = request.json['email']
+
+    try:
+
+        user = User.query.filter_by(email=email).first()
+        send_reset_password(user)
+        flash('An email has been sent with instructions to reset your password.', 'info')
+        return redirect(url_for('users.login'))
+
+        
 
