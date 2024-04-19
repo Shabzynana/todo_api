@@ -4,6 +4,8 @@ from todo_api.utils.serializers import user_schema, users_schema,User_Schema
 from todo_api import db,bcrypt
 from todo_api.models import User, Todo
 from todo_api.utils.email import send_reset_password
+from todo_api.utils.token import verify_token
+
 
 
 users = Blueprint('users',__name__, url_prefix="/api", template_folder ="templates/user")
@@ -227,7 +229,7 @@ def logout():
 def reset_token():
 
     email = request.json['email']
-
+    
     try:
 
         email_exists = User.query.filter_by(email=email).first()
@@ -257,5 +259,32 @@ def reset_token():
     )          
 
 
+@users.route("/reset/<token>", methods=['POST'])   
+def reset_password(token):
 
+    password = request.json['password']
 
+    try:
+
+        user = verify_token(token)
+        if user is None:
+            return jsonify({"msg":"That is an invalid or expired link!"})
+
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        user.password = hashed_password
+        db.session.commit()
+        return jsonify({"msg": "Password Updated, You can now log in!"})
+
+    except Exception as error:
+        error_message = str(error)  # Convert the error to a string
+        print(f"{type(error).__name__}: {error}")
+        return (
+            jsonify(
+                {
+                    "error": "failed",
+                    "message": error_message,
+                }
+            ),
+            500,
+    )              
+       
