@@ -1,11 +1,11 @@
 import datetime
 from flask import url_for,flash,request,redirect,Blueprint,abort,jsonify,session  #type : ignore
-from todo_api.utils.serializers import user_schema, users_schema,User_Schema
+from todo_api.utils.serializers import user_schema, users_schema
 from todo_api import db,bcrypt
 from todo_api.models import User, Todo
 from todo_api.utils.email import send_reset_password, resend_email, send_email
 from todo_api.utils.token import verify_token
-from todo_api.utils.function import current_user_id
+from todo_api.utils.function import current_user_id, login_required
 
 
 
@@ -18,6 +18,16 @@ def home():
 
     return jsonify({"message": "i love jesus"})
 
+
+@users.route('/me')
+@login_required
+def homeeeee():
+
+    sam = current_user_id()
+    result = user_schema.dump(sam)
+
+    return jsonify(
+        {"msg": result})
 
 
 @users.route("/users", methods=['GET'])    
@@ -165,7 +175,7 @@ def register():
             )
 
 
-        new_user = User(first_name=first_name, last_name=last_name,username=username,email=email,gender=gender,password=hashed_password,confirmed=False)
+        new_user = User(first_name=first_name,last_name=last_name,username=username,email=email,gender=gender,password=hashed_password,confirmed=False)
         db.session.add(new_user)
         db.session.commit()
 
@@ -222,6 +232,7 @@ def login():
 def logout():
     
     session.clear()
+    print({"msg": "User logout"})
     return jsonify(
         {
             "msg": "User logout, Successful"
@@ -277,7 +288,8 @@ def reset_password(token):
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
-        return jsonify({"msg": "Password Updated, You can now log in!"})
+        return jsonify(
+            {"msg": "Password Updated, You can now log in!"})
 
     except Exception as error:
         error_message = str(error)  # Convert the error to a string
@@ -293,30 +305,38 @@ def reset_password(token):
     )              
        
 @users.route('/email/resend', methods=['POST'])
+@login_required
 def resend():
 
-    try:
-
-        resend_email(current_user_id())
-        return jsonify(
-            {"msg": "A new confirmation mail has been sent with instructions to verify your account."}), 200
+    resend_email(current_user_id())
+    print(f"Email sent to {current_user_id()}")
+    return jsonify(
+        {"msg": "A new confirmation mail has been sent with instructions to verify your account."}), 200
     
-    except Exception as error:
-        error_message = str(error)  # Convert the error to a string
-        print(f"{type(error).__name__}: {error}")
-        return (
-            jsonify(
-                {
-                    "error": "failed",
-                    "message": error_message,
-                }
-            ),
-            500,
-    )             
+
+    # try:
+
+    #     resend_email(current_user_id())
+    #     return jsonify(
+    #         {"msg": "A new confirmation mail has been sent with instructions to verify your account."}), 200
+    
+    # except Exception as error:
+    #     error_message = str(error)  # Convert the error to a string
+    #     print(f"{type(error).__name__}: {error}")
+    #     return (
+    #         jsonify(
+    #             {
+    #                 "error": "failed",
+    #                 "message": error_message,
+    #             }
+    #         ),
+    #         500,
+    # )             
 
 
 
 @users.route('/confirm/<token>', methods=['POST'])
+# @login_required
 def confirm_email(token):
 
     tok = verify_token(token)

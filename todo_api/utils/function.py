@@ -1,6 +1,6 @@
 import os
 import secrets
-from flask import url_for, flash, current_app, redirect, session
+from flask import url_for, flash, current_app, redirect, session, jsonify
 from functools import wraps
 from todo_api.models import User
 
@@ -12,8 +12,8 @@ def current_user_id():
         user = User.query.filter_by(id=id).first()
         if user:
             return user
-    return ("NO USER")       
-
+    return (
+        {"msg": "NO USER, Please Login In"}), 400     
 
 
 def check_confirmed(func):
@@ -43,6 +43,9 @@ def login_required(func):
     def inner(*args, **kwargs):
         if session.get('logged_in'):
             return func(*args, **kwargs)
-        return redirect(url_for('users.login'))
+
+        # return redirect(url_for('users.login'))
+        return jsonify({"msg": "Please Log In!"})
+
     return inner
 
