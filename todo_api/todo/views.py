@@ -58,12 +58,13 @@ def all_todos():
             500,
     ) 
 
-@todos.route("/todo/<int>", methods=['GET'])
-def todo_id(int):
+@todos.route("/todo/<id>", methods=['GET'])
+def todo_id(id):
 
     todo = Todo.query.get(id)
     if todo:
-        return jsonify({"msg": todo_schema.dump(todo)})
+        return jsonify(
+            {"msg": todo_schema.dump(todo)}), 200
 
     return jsonify({"msg": "No task with such id"})
     
