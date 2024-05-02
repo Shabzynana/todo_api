@@ -67,5 +67,38 @@ def todo_id(id):
             {"msg": todo_schema.dump(todo)}), 200
 
     return jsonify({"msg": "No task with such id"})
-    
 
+
+@todos.route("/update_todo/<id>", methods=['PUT'])
+@login_required
+def update_todo(id):
+
+    try:
+        todo = Todo.query.get_or_404(id)
+        if todo.author != current_user_id():
+            # Forbidden, No Access
+            abort(403)
+            return jsonify({"msg": "Not authorized!"})
+            # flash('Not authorized', 'danger')
+        todo.text = request.json['text']
+        todo.date = request.json['date']
+        db.session.commit()
+        return jsonify({"msg": "task updated"})
+
+    except Exception as error:
+        error_message = str(error)  # Convert the error to a string
+        print(f"{type(error).__name__}: {error}")
+        return (
+            jsonify(
+                {
+                    "error": "failed",
+                    "message": error_message,
+                }
+            ),
+            500,
+    ) 
+    # Pass back the old blog post information so they can start again with
+    # the old text and title.
+    # elif request.method == 'GET':
+        # form.text.data = todo.text
+        # form.date.data = todo.date
