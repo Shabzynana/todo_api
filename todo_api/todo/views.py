@@ -102,3 +102,31 @@ def update_todo(id):
     # elif request.method == 'GET':
         # form.text.data = todo.text
         # form.date.data = todo.date
+
+@todos.route("/delete_todo/<id>", methods=['DELETE'])
+@login_required
+def delete_todo(id):
+
+    try:
+
+        todo = Todo.query.get(id)
+        if todo.author != current_user_id():
+            abort(403)
+            return jsonify(
+                {"msg": "Not Authorized!"}), 403
+        db.session.delete(todo)
+        db.session.commit()
+        return jsonify({"msg": "Task Deleted!"})    
+
+    except Exception as error:
+        error_message = str(error)  # Convert the error to a string
+        print(f"{type(error).__name__}: {error}")
+        return (
+            jsonify(
+                {
+                    "error": "failed",
+                    "message": error_message,
+                }
+            ),
+            500,
+    ) 
