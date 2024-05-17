@@ -355,3 +355,4 @@ def confirm_email(token):
         db.session.commit()
         return jsonify (
             {"msg": f"You have confirmed your account. Thanks {user.username}"}), 200
+

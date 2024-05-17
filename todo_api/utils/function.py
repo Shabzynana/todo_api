@@ -41,11 +41,9 @@ def check_confirmed(func):
 def login_required(func):
     @wraps(func)
     def inner(*args, **kwargs):
-        if session.get('logged_in'):
-            return func(*args, **kwargs)
-
-        # return redirect(url_for('users.login'))
-        return jsonify({"msg": "Please Log In!"})
-
+        if not session.get('logged_in'):
+            return jsonify({"msg": "Please Log In!"})
+        return func(*args, **kwargs)
+        
     return inner
-
+   

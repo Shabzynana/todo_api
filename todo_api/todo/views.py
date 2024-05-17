@@ -10,6 +10,7 @@ from todo_api.utils.function import current_user_id, login_required
 todos = Blueprint('todos' ,__name__, url_prefix="/api")
  
 @todos.route("/create_todo", methods=['POST'])
+@login_required
 def create_todo():
 
     try:
